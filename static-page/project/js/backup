@@ -1,0 +1,108 @@
+//desk class
+class DeskObject {
+
+    constructor(id, name, available, address, price, latitude, longitutde) {
+        this.id = id;
+        this.name = name;
+        this.available = available;
+        this.address = address;
+        this.price = price;
+        this.latitude = latitude;
+        this.longitutde = longitutde;
+        this.comment = this.comment;
+      }
+
+
+    getIcon() {
+        if (this.available === 1) {
+          return '<img src="img/checkicon.png" class="icon" alt="Check Icon">';
+        } else {
+          return '<img src="img/crossicon.png" class="icon" alt="Cross Icon">';
+        }
+      }
+}
+
+
+//table elements
+const tabelRow = 'tr';
+const tableColumn = 'td';
+
+function getAllDesks() {
+    fetch('https://matthiasbaldauf.com/wbdg23/desks')
+        .then(response => response.json())
+        .then(data => {
+            // sort data by id
+            const sortedData = data.sort((a, b) => a.id - b.id);
+            const datenTabelle = document.getElementById('deskTable');
+            const tbody = datenTabelle.getElementsByTagName('tbody')[0];
+
+            data.forEach(item => {
+                // add row
+                const row = document.createElement('tr');
+
+                // add columns
+                const idCell = document.createElement('td');
+                const nameCell = document.createElement('td');
+                const availableCell = document.createElement('td');     
+                const addressCell = document.createElement('td');
+                const priceCell = document.createElement('td');
+                const latitudeCell = document.createElement('td');
+                const longitutdeCell = document.createElement('td');
+                const commentCell = document.createElement('td');
+
+                // add content
+                idCell.textContent = item.id;
+                nameCell.textContent = item.name;
+
+                availableCell.innerHTML = ;
+                
+
+                addressCell.textContent = item.address;
+                priceCell.textContent = item.price;
+                latitudeCell.textContent = item.lat;
+                longitutdeCell.textContent = item.lon;
+                commentCell.textContent = item.comment;
+
+                // append row
+                row.appendChild(idCell);
+                row.appendChild(nameCell);
+                row.appendChild(availableCell);
+                row.appendChild(addressCell);
+                row.appendChild(priceCell);
+                row.appendChild(latitudeCell);
+                row.appendChild(longitutdeCell);
+                row.appendChild(commentCell);
+                tbody.appendChild(row);
+            });
+        })
+        .catch(error => {
+            console.error('Desks could not be loaded:', error);
+        });
+}
+
+
+function loadTable(allDesks) {
+    allDesks.forEach
+}
+
+function getDetailDesk(deskId, start, stop, studid) {
+
+    fetch('https://matthiasbaldauf.com/wbdg23/bookings?deskid=' + encodeURIComponent(deskId) + '&start=' + encodeURIComponent(start) + '&stop=' + encodeURIComponent(stop) + '&studid=' + encodeURIComponent(studid))
+        .then(response => response.json())
+        .then(data => {
+            // Daten erhalten, jetzt können Sie sie darstellen
+            const datenContainer = document.getElementById('allBookingsContainer');
+            data.forEach(item => {
+                const element = document.createElement('p');
+                element.textContent = item.deskid; // Beispiel: Angenommen, die Daten enthalten ein Feld "name"
+                datenContainer.appendChild(element);
+            });
+        })
+        .catch(error => {
+            console.error('Deskinfo could not be loaded', error);
+        });
+}
+
+// execute on load
+document.addEventListener('DOMContentLoaded', getAllDesks);
+document.addEventListener('DOMContentLoaded', getAllBookingOfDesks);

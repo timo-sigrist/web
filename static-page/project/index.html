@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Desk Sharing Management</title>
+    
+    <link rel="icon" href="img/favicon.ico" type="image/x-icon">
+
+    <!-- stylesheets-->
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/css/bootstrap.min.css">
+    
+    <!-- bootstrap -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+    <!-- Leaflet -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+
+</head>
+
+
+
+<body id="body">
+     <!--javascript files in body for load with table conetent-->
+     <script src="js/script.js"></script>
+
+    <div id="pageContainer" class="container">
+        <h1><img src="img/logo.png" style="margin-right: 10px;">Desk Sharing Management</h1><br><br>
+
+        <button class="btn btn-primary toggle-button float-end" data-toggle="modal" data-target="#myModal">My reservations (<a id="reservationCounter">0</a>)</button>
+        
+        <!-- reservation modal -->
+        <div class="modal fade bd-example-modal-xl" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-xl" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h2 class="modal-title" id="myModalLabel">My reservations</h2>
+                        <button type="button" class="btn-close float-start" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+
+                    <div class="modal-body">
+                        <h5>All your reservation are listed here</h5>
+                        <div id="cancelAlertContainer"></div>
+                        <ul class="list" id="myReservationList">
+                            <!-- dynamic list-->
+                        </ul>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="allDesksContent">
+            <h2>All desks</h2>
+            <div class="float-end">
+                <label class="form-uncheck-label me-2">CHF</label>
+                <div class="form-check form-switch float-end">
+                    <input class="form-check-input" type="checkbox" id="currencyToggle">
+                    <label class="form-check-label" for="flexSwitchCheckChecked">EUR</label>
+                </div>
+            </div>
+            <div id="tableAlertContainer"></div>
+            <table id="deskTable" class="table table-striped table-hover table-responsive-sm" >
+                <thead class="table-primary">
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Available</th>
+                        <th>Address</th>
+                        <th>Price per hour</th>
+                        <th>Comment</th>
+                        <th>Display on Map</th>
+                    </tr>
+                </thead>
+                <tbody class="table-group-divider"><!-- dynamic desk-table --></tbody>
+            </table>
+        </div><hr><br>
+
+        <div id="reservationContent" class="row">
+            <h2>Book your desk now!</h2>
+            <div id="reservationAlertContainer"></div>
+            <div class="col-lg-6 col-md-12 mb-4">
+
+                <form id="overviewForm" novalidate>
+                    <label class="form-label">Desk:</label>
+                    <select id="deskInput" class="form-select"></select>
+                    <label class="form-label" for="fromDateInput">From:</label>
+                    <div class="input-group">
+                        <input type="date" id="fromDateInput" class="form-control" required>
+                        <input type="time" id="fromTimeInput" class="form-control" required>
+                    </div>
+                    <label class="form-label">To:</label>
+                    <div class="input-group">
+                        <input type="date" id="toDateInput" class="form-control" required>
+                        <input type="time" id="toTimeInput" class="form-control" required>
+                    </div>
+                    <div class="form-floating" style="margin-top: 1em;">
+                        <input type="number" id="studIdInput" class="form-control" placeholder="Stud-Id" required>
+                        <label for="studIdInput" class="form-label">Stud-Id:</label>
+                        <div class="invalid-feedback">Student-Id is required</div>
+                    </div>
+                    <button id="searchButton" class="btn btn-primary mt-2">Search</button>
+                </form>
+
+                <!-- Bootstrap build-in form validation -->
+                <script>
+                    const form = document.getElementById('overviewForm');
+                    form.addEventListener('submit', e => {
+                        e.preventDefault();
+                        if (form.checkValidity()) {
+                            showDeskBookings();
+                        }
+                        form.classList.add('was-validated')
+                    })
+                </script>
+
+            </div>
+            <div class="card col-lg-6 col-md-12 mb-4">
+                <div class="card-body">
+                    <h3 id="deskTitle" class="card-title">Select a desk</h2>
+                        <div id="reservationIntro" class="card-text">Select a desk to display it's reservations.</div>
+                        <ul class="list"><!-- dynamic reservation list --></ul>
+                </div>
+            </div>
+
+            <div class="col-12 mb-4">
+                <div id="mapContainer" style="width: auto; height: 400px;"></div>
+            </div>
+
+            <div id="bookingContent" class="col">
+                <div id="bookingAlertContainer"></div>
+                <div id="bookingControlls" class="d-none">
+                    <h3>You book: <b id="bookname"></b></h3>
+                    <p>Cost per hour: <a id="deskCost">12</a><br>Cost for <a id="bookTime">12</a> hours: <a id="bookCost">12 CHF</a></p>
+                    <form id="bookingForm" novalidate>
+
+                        <div class="row">
+                            <div class="col-5">
+                                <div class="form-floating" style="margin-top: 1em;">
+                                    <input type="text" id="nameInput" class="form-control" placeholder="Name" required>
+                                    <label for="NameInput" class="form-label">Name:</label>
+                                    <div class="invalid-feedback">Name is required</div>
+                                </div>
+                            </div>
+                            <div class="col-5">
+                                <div class="form-floating" style="margin-top: 1em;">
+                                    <input type="email" id="emailInput" class="form-control" placeholder="Email" required>
+                                    <label for="emailInput" class="form-label">Email:</label>
+                                    <div class="invalid-feedback">Email is required</div>
+                                </div>
+                            </div>
+                            <div class="col-2">
+                                <button id="bookButton" class="btn btn-success btn-lg mt-3 float-end ">Book now</button>
+                            </div>
+                        </div>
+                        
+                    </form>
+    
+                    <!-- Bootstrap build-in form validation -->
+                    <script>
+                        const bookingForm = document.getElementById('bookingForm');
+                        bookingForm.addEventListener('submit', book => {
+                            book.preventDefault();
+                            if (bookingForm.checkValidity()) {
+                                bookDeskAPI();
+                            }
+                            bookingForm.classList.add('was-validated')
+                        })
+                    </script>
+                </div>
+                <p id="BookingInfo" class="text-info d-none">To book a reservation, select an empty timespan for the desk.</p>
+            </div>
+        </div><hr><br>
+    </div>
+
+</body>
+<!-- scripts -->
+
+</html>
