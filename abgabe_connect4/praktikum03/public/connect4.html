@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Vier gewinnt</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="./connect4-winner.js"></script>
+  <script>
+
+/*
+ *  This solution sould be considered as a proof of concept – the code 
+ *  definitely needs some cleanup and documentation
+ */
+ 
+let state = {
+  board: [
+    [ '', '', '', '', '', '', '' ],
+    [ '', '', '', '', '', '', '' ],
+    [ '', '', '', '', '', '', '' ],
+    [ '', '', '', '', '', '', '' ],
+    [ '', '', '', '', '', '', '' ],
+    [ '', '', '', '', '', '', '' ]
+  ],
+  next: 'b'
+}
+const eventListeners = [];
+
+
+const SERVICE = "http://localhost:3000/api/data/c4state?api-key=c4game"
+
+
+//  Initialize game
+//
+function initGame () {
+  let board = showBoard()
+  attachEventHandler(board)
+}
+
+
+//  Show board
+// 
+function showBoard () {
+  if (state.next == 'b') {
+    playerTurnLabel.textContent = 'Player Blue'
+  } else {
+    playerTurnLabel.textContent = 'Player Red'
+  }
+
+  let board = document.querySelector(".board")
+
+  // first remove all fields
+  while (board.firstChild) { board.removeChild(board.firstChild) }
+
+  // Iterate through the board array
+  for (let i = 0; i < state.board.length; i++) {
+      for (let j = 0; j < state.board[i].length; j++) {
+        var fieldDiv = elt("div", { class: "field" })
+
+        fieldDiv.addEventListener("click", () => playPiece(i, j))
+
+        // Appending the created elements to the board
+        if (board) {
+            board.appendChild(fieldDiv);
+        }
+
+        let fieldState = state.board[i][j]
+        if (fieldState == 'b') {
+            fieldDiv.appendChild(elt("div", { class: "blue piece" }));
+        } else if (fieldState == 'r') {
+            fieldDiv.appendChild(elt("div", { class: "red piece" }));
+        }
+      }
+  }
+
+  return board
+}
+
+
+//  Helper function for DOM manipulation
+// 
+function elt (type, attrs, ...children) {
+  let node = document.createElement(type)
+  for (a in attrs) {
+    node.setAttribute(a, attrs[a])
+  }
+  for (let child of children) {
+    if (typeof child != "string") node.appendChild(child)
+    else node.appendChild(document.createTextNode(child))
+  }
+  return node
+}
+
+
+//  Attach event handler to board
+//
+function attachEventHandler (board) {
+  board.addEventListener("click", (e) => {
+    console.log(e.target)
+  })
+}
+
+let allowClicks = true; // Flag to control clicks
+function playPiece(i, j) {
+  if (!allowClicks) {
+    return; // If clicks are not allowed, do nothing
+  }
+  let stackCounter = state.board.length - 1
+  
+  if (state.board[0][j] == '') {
+      while (state.board[stackCounter][j] != '') {
+          stackCounter--
+      }
+  
+      let currentColor = state.next;
+      const playerRed = 'Player Red';
+      const playerBlue = 'Player Blue';
+      let currentPlayer;
+      let nextPlayer;
+
+      //setting piece
+      state.board[stackCounter][j] = currentColor;
+      if (currentColor == 'r') {
+        currentPlayer = playerRed
+        nextPlayer = playerBlue
+        state.next = 'b'
+        playerTurnLabel.textContent = playerBlue
+      } else {
+        currentPlayer = playerBlue
+        nextPlayer = playerRed
+        state.next = 'r'
+        playerTurnLabel.textContent = playerRed
+      }
+      showBoard()
+
+      if(connect4Winner(currentColor, state.board)) {
+        alert(currentPlayer + ' is the Winner!')
+        //remove all eventlisteners for fields
+        allowClicks = false
+      }
+  }
+}
+
+
+//  Get current state from server and re-draw board
+//
+function loadState () {
+  fetch(SERVICE).then(response => response.json()).then(newState => {
+    state = newState
+    showBoard();
+  }).catch((error) => {
+    console.error('Error loading state:', error);
+  });
+}
+
+//  Put current state to server
+//
+function saveState () {
+  fetch(SERVICE, {
+      method: 'PUT', // Assuming you use POST to save the game state
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(state), // Send the current state to the server
+  });
+}
+
+  </script>
+
+</head>
+<body>
+
+  <label id="">next Turn: <a id="playerTurnLabel"></a></label>
+
+  <div class="board"></div>
+  
+  <div class="controls">
+    <button onclick="loadState()">Load</button>
+    <button onclick="saveState()">Save</button>
+  </div>
+
+  <script>
+    initGame()
+  </script>
+
+</body>
+</html>

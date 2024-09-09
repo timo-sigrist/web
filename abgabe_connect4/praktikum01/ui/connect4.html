@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Vier gewinnt</title>
+
+  <style>
+
+    div {
+      box-sizing: border-box;
+    }
+
+    .board {
+      width: 84vw;
+      margin: auto;
+      outline: 1px solid black;
+      display: flex;
+      flex-wrap: wrap;
+   }
+
+    .board .field {
+      border: 1px solid black;
+      width: 12vw;
+      height: 12vw;
+    }
+
+    .board .field:first-child {
+      display: block;
+    }
+
+    .board .field .piece {
+      width: 10vw;
+      height: 10vw;
+      border-radius: 50%;
+      margin: 1vw;
+    }
+    .board .field .blue {
+      background-color: blue;
+    }
+    .board .field .red {
+      background-color: red;
+    }
+
+  </style>
+
+  <script src="connect4.js"></script>
+
+</head>
+<body>
+
+  <div class="board">
+
+    <script>showBoard()</script>
+
+  </div>
+
+</body>
+</html>

@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Vier gewinnt</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="connect4.js"></script>
+  <script src="elt.js"></script>
+</head>
+<body>
+  <div id="controlsServer" class="controls">
+    <button onclick="loadStateServer()">Load on Server</button>
+    <button onclick="saveState()">Save on Server</button>
+  </div>
+  <div id="controlsBrowser" class="controls">
+    <button onclick="loadStateBrowser()">Load on Server</button>
+    <button onclick="saveState()">Save on Server</button>
+  </div>
+  <button class="btnNewGame" onclick="resetGame()">new game</button>
+  <label id="">next Turn: <a id="playerTurnLabel"></a></label>
+  <div class="board"></div>
+ 
+  <div id="board" class="board"></div>
+</body>
+</html>
